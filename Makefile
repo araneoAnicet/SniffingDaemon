@@ -10,5 +10,5 @@ Sniffer.o: Sniffer/Sniffer.c
 	clang -c Sniffer/Sniffer.c
 
 clean:
-	rm -rf *.o test
+	rm -rf Sniffer/*.o *.o test
 
