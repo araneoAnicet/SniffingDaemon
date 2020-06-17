@@ -25,9 +25,18 @@ void close_sniffer_socket(Sniffer* sniffer) {
 }
 
 inline void print_headers(struct ethhdr* eth) {
+    int i;
     printf("\n\n PACKET\n");
-    printf("\t Source : %.2X-%.2X-%.2X-%.2X-%.2X-%.2X\n", eth->h_source[0],eth->h_source[1],eth->h_source[2],eth->h_source[3],eth->h_source[4],eth->h_source[5]);
-    printf("\t Destination : %.2X-%.2X-%.2X-%.2X-%.2X-%.2X\n",eth->h_dest[0],eth->h_dest[1],eth->h_dest[2],eth->h_dest[3],eth->h_dest[4],eth->h_dest[5]);
+    printf("\t Source: ");
+    for (i = 0; i < 5; i++) {
+        printf("%.2X-", eth->h_source[i]);
+    }
+    printf("%.2X\n", eth->h_source[5]);
+    printf("\t Destination: ");
+    for (i = 0; i < 5; i++) {
+        printf("%.2X-", eth->h_dest[i]);
+    }
+    printf("%.2X\n", eth->h_dest[5]);
     printf("\t Protocol : %d\n",eth->h_proto);
 }
 
