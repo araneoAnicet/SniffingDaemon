@@ -1,7 +1,28 @@
 #include "Sniffer.h"
 
+struct sockaddr* get_sockaddr_by_name(char* interface_name) {
+    struct sockaddr* result;
+    struct ifaddrs* interfaces;
+    struct ifaddrs* current_interface;
+    if (getifaddrs(&interfaces) == -1) {
+        printf("An error occured while getting interfaces information\n");
+        exit(EXIT_FAILURE);
+    }
+    current_interface = interfaces;
+    while (current_interface != NULL) {
+        if (strcmp(current_interface->ifa_name, interface_name) == 0) {
+            result = current_interface->ifa_addr;
+            freeifaddrs(interfaces);
+            return result;
+        }
+        current_interface = current_interface->ifa_next;
+    }
+    freeifaddrs(interfaces);
+    exit(EXIT_FAILURE);
+}
 
 int create_sniffer_socket(Sniffer* sniffer) {
+    struct sockaddr* interface_socket_addr;
     int socket_fd = socket(
         sniffer->socket.domain,
         sniffer->socket.type,
@@ -10,6 +31,11 @@ int create_sniffer_socket(Sniffer* sniffer) {
 
     if (socket_fd < 0) {
         printf("An error occured while creating a sniffer socket\n");
+        return -1;
+    }
+    interface_socket_addr = get_sockaddr_by_name(sniffer->socket.interface_name);
+    if (bind(socket_fd, interface_socket_addr, sizeof(interface_socket_addr)) == -1) {
+        printf("An error occured while binding\n");
         return -1;
     }
     sniffer->socket.fd = socket_fd;
