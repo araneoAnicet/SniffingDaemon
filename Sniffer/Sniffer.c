@@ -1,24 +1,24 @@
 #include "Sniffer.h"
 
-inline struct sockaddr* get_sockaddr_by_name(char* interface_name) {
+inline int get_sockaddr_by_name(Sniffer* sniffer, struct sockaddr** interface_addr) {
     struct sockaddr* result;
     struct ifaddrs* interfaces;
     struct ifaddrs* current_interface;
     if (getifaddrs(&interfaces) == -1) {
         printf("An error occured while getting interfaces information\n");
-        exit(EXIT_FAILURE);
+        return -1;
     }
     current_interface = interfaces;
     while (current_interface != NULL) {
-        if (strcmp(current_interface->ifa_name, interface_name) == 0) {
-            result = current_interface->ifa_addr;
+        if (strcmp(current_interface->ifa_name, sniffer->socket.interface_name) == 0) {
+            *interface_addr = current_interface->ifa_addr;
             freeifaddrs(interfaces);
-            return result;
+            return 0;  // interface address found
         }
         current_interface = current_interface->ifa_next;
     }
     freeifaddrs(interfaces);
-    exit(EXIT_FAILURE);
+    return 1;  // no interface with this name found
 }
 
 int create_sniffer_socket(Sniffer* sniffer) {
@@ -33,7 +33,7 @@ int create_sniffer_socket(Sniffer* sniffer) {
         printf("An error occured while creating a sniffer socket\n");
         return -1;
     }
-    interface_socket_addr = get_sockaddr_by_name(sniffer->socket.interface_name);
+    interface_socket_addr = get_sockaddr_by_name(sniffer, &interface_socket_addr);
     if (bind(socket_fd, interface_socket_addr, sizeof(interface_socket_addr)) == -1) {
         printf("An error occured while binding\n");
         return -1;

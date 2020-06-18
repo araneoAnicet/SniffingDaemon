@@ -31,7 +31,7 @@ struct Sniffer {
 typedef struct Sniffer Sniffer;
 
 
-inline struct sockaddr* get_sockaddr_by_name(char* interface_name);
+inline int get_interface_addr_by_name(Sniffer* sniffer, struct sockaddr** interface_addr);
 int create_sniffer_socket(Sniffer* sniffer);
 void close_sniffer_socket(Sniffer* sniffer);
 void print_headers(struct ethhdr* eth);
