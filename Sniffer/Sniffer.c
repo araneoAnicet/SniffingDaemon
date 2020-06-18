@@ -1,6 +1,6 @@
 #include "Sniffer.h"
 
-struct sockaddr* get_sockaddr_by_name(char* interface_name) {
+inline struct sockaddr* get_sockaddr_by_name(char* interface_name) {
     struct sockaddr* result;
     struct ifaddrs* interfaces;
     struct ifaddrs* current_interface;
