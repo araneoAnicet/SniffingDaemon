@@ -8,6 +8,8 @@
 #include <string.h>
 #include <linux/if_ether.h>
 #include <ifaddrs.h>
+#include <net/if.h>
+#include <sys/ioctl.h>
 
 #define DEFAULT_BUFFER_SIZE 65536
 
@@ -31,8 +33,8 @@ struct Sniffer {
 typedef struct Sniffer Sniffer;
 
 
-inline int get_interface_addr_by_name(Sniffer* sniffer, struct sockaddr** interface_addr);
+int get_interface_addr_by_name(Sniffer* sniffer, struct sockaddr** interface_addr);
 int create_sniffer_socket(Sniffer* sniffer);
 void close_sniffer_socket(Sniffer* sniffer);
-void print_headers(struct ethhdr* eth);
+void print_headers(struct ethhdr* eth, struct iphdr* iph);
 int sniff(Sniffer* sniffer);

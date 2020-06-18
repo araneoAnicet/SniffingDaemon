@@ -1,6 +1,6 @@
 #include "Sniffer.h"
 
-inline int get_sockaddr_by_name(Sniffer* sniffer, struct sockaddr** interface_addr) {
+int get_interface_addr_by_name(Sniffer* sniffer, struct sockaddr** interface_addr) {
     struct sockaddr* result;
     struct ifaddrs* interfaces;
     struct ifaddrs* current_interface;
@@ -22,7 +22,7 @@ inline int get_sockaddr_by_name(Sniffer* sniffer, struct sockaddr** interface_ad
 }
 
 int create_sniffer_socket(Sniffer* sniffer) {
-    struct sockaddr* interface_socket_addr;
+    //struct sockaddr* interface_socket_addr;
     int socket_fd = socket(
         sniffer->socket.domain,
         sniffer->socket.type,
@@ -33,8 +33,14 @@ int create_sniffer_socket(Sniffer* sniffer) {
         printf("An error occured while creating a sniffer socket\n");
         return -1;
     }
-    interface_socket_addr = get_sockaddr_by_name(sniffer, &interface_socket_addr);
-    if (bind(socket_fd, interface_socket_addr, sizeof(interface_socket_addr)) == -1) {
+    
+    socklen_t opt_len = strnlen(sniffer->socket.interface_name, IF_NAMESIZE);
+    if (opt_len == IF_NAMESIZE) {
+        printf("An error occured while getting interface name size");
+        return -1;
+    }
+
+    if (setsockopt(socket_fd, SOL_SOCKET, SO_BINDTODEVICE, sniffer->socket.interface_name, opt_len) == -1) {
         printf("An error occured while binding\n");
         return -1;
     }
@@ -50,19 +56,28 @@ void close_sniffer_socket(Sniffer* sniffer) {
     printf("Sniffer is removed successfully!\n");
 }
 
-inline void print_headers(struct ethhdr* eth) {
+inline void print_headers(struct ethhdr* eth, struct iphdr* iph) {
     int i;
+    struct sockaddr_in source_socket, destination_socket;
+    memset(&source_socket, 0, sizeof(source_socket));
+    memset(&destination_socket, 0, sizeof(destination_socket));
+    source_socket.sin_addr.s_addr = iph->saddr;
+    destination_socket.sin_addr.s_addr = iph->daddr;
     printf("\n\n PACKET\n");
-    printf("\t Source: ");
+    printf("\t Source:\n");
+    printf("\t\tMAC: ");
     for (i = 0; i < 5; i++) {
         printf("%.2X-", eth->h_source[i]);
     }
     printf("%.2X\n", eth->h_source[5]);
-    printf("\t Destination: ");
+    printf("\t\tIP: %s\n", inet_ntoa(source_socket.sin_addr));
+    printf("\t Destination:\n");
+    printf("\t\tMAC: ");
     for (i = 0; i < 5; i++) {
         printf("%.2X-", eth->h_dest[i]);
     }
     printf("%.2X\n", eth->h_dest[5]);
+    printf("\t\tIP: %s\n", inet_ntoa(destination_socket.sin_addr));
     printf("\t Protocol : %d\n",eth->h_proto);
 }
 
@@ -71,6 +86,8 @@ int sniff(Sniffer* sniffer) {
     struct sockaddr source_addr;
     int source_addr_len = sizeof(source_addr);
     struct ethhdr* eth_headers;
+    struct iphdr* ip_headers;
+    
     while (1) {
         buffer_length = recvfrom(
         sniffer->socket.fd,
@@ -88,6 +105,7 @@ int sniff(Sniffer* sniffer) {
         }
 
         eth_headers = (struct ethhdr*) sniffer->socket.buffer;
-        print_headers(eth_headers);
+        ip_headers = (struct iphdr*) (sniffer->socket.buffer + sizeof(struct ethhdr));
+        print_headers(eth_headers, ip_headers);
     }
 }
