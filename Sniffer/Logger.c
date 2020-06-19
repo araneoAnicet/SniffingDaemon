@@ -14,6 +14,49 @@ int save_log(
     return 0;
 }
 
+int read_log(FILE* logfile, PacketLog** packet_logs, int* top_index) {
+    *top_index = 0;
+    int number_of_spaces = 0;
+    PacketLog* temp_logs = (PacketLog*) malloc(sizeof(PacketLog));
+    PacketLog temp_log;
+    struct sockaddr_in temp_socket;
+    char* ip_addr = '\0';
+    char* number_of_packets = '\0';
+    char* interface_name = '\0';
+
+    char temp_char;
+    while (temp_char = fgetc(logfile) != EOF) {
+        if (temp_char == '\n') {
+            temp_log.ip = ip_addr;
+            temp_log.interface = interface_name;
+            temp_log.amount_of_packets = atoi(number_of_packets);
+            ip_addr = '\0';
+            number_of_packets = '\0';
+            interface_name = '\0';
+            temp_logs[*top_index] = temp_log;
+            (*top_index)++;
+            temp_logs = (PacketLog*) realloc(temp_logs, sizeof(temp_logs) * 2);
+            number_of_spaces = 0;
+            continue;
+        }
+        
+        if (temp_char == ' ') {
+            number_of_spaces++;
+            continue;    
+        }
+        if (number_of_spaces == 0) {
+            strncat(number_of_packets, &temp_char, 1);
+
+        } else if (number_of_spaces == 1) {
+            strncat(ip_addr, &temp_char, 1);
+
+        } else if (number_of_spaces == 3) {
+            strncat(interface_name, &temp_char, 1);
+        }
+    }
+
+}
+
 int add_log(PacketLog** packet_logs, PacketLog new_packet, int* array_top_index) {
     int index_of_log = search_log(packet_logs, new_packet, 0, *array_top_index - 1);
     if (index_of_log == -1) {
