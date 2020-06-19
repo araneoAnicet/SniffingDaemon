@@ -1,5 +1,32 @@
 #include "Logger.h"
 
+int rewrite_logs(char* logfile_name, PacketLog* packet_logs, int top_index) {
+    int remove_status = remove(logfile_name);
+    int write_status;
+    int i;
+    if (remove_status == -1) {
+        printf("An error occured while deleting log file\n");
+        return -1;
+    }
+    FILE* logfile = fopen(logfile_name, "w");
+    if (logfile == NULL) {
+        printf("An error occured while creating a new log file\n");
+        return -1;
+    }
+    for (i = 0; i <= top_index; i++) {
+        write_status = save_log(
+            logfile,
+            packet_logs[i].ip,
+            packet_logs[i].amount_of_packets,
+            packet_logs[i].interface
+        );
+        if (write_status == -1) {
+            printf("An error occured while writing to a new log file\n");
+            return -1;
+        }
+    }
+}
+
 int save_log(
     FILE* logfile,
     char ip_addr[],
@@ -66,12 +93,12 @@ int read_log(FILE* logfile, PacketLog** packet_logs, int* top_index) {
 
 }
 
-int add_log(PacketLog** packet_logs, PacketLog new_packet, int* array_top_index) {
-    int index_of_log = search_log(*packet_logs, new_packet, 0, *array_top_index - 1);
+int add_log(PacketLog** packet_logs, PacketLog new_packet, int* new_element_index) {
+    int index_of_log = search_log(*packet_logs, new_packet, 0, *new_element_index - 1);
     if (index_of_log == -1) {
         *packet_logs = (PacketLog*) realloc(packet_logs, sizeof(packet_logs) * 2);
-        (*packet_logs)[*array_top_index] = new_packet;
-        *array_top_index++;
+        (*packet_logs)[*new_element_index] = new_packet;
+        *new_element_index++;
         return 1;
     } 
     (*packet_logs)[index_of_log].amount_of_packets++;
@@ -97,8 +124,8 @@ int search_log(PacketLog* packet_logs, PacketLog searched_packet, int left_bound
     return -1; 
 }
 
-int sort_logs(PacketLog* packet_logs, int last_log_index) {
-    qsort(packet_logs, last_log_index + 1, sizeof(PacketLog), (int(*) (const void *, const void *)) compare_logs);
+int sort_logs(PacketLog* packet_logs, int top_index) {
+    qsort(packet_logs, top_index + 1, sizeof(PacketLog), (int(*) (const void *, const void *)) compare_logs);
 }
 
 int compare_logs(PacketLog first_log, PacketLog second_log) {
