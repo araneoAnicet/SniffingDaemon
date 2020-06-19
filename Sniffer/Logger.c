@@ -18,8 +18,11 @@ int read_log(FILE* logfile, PacketLog** packet_logs, int* top_index) {
     *top_index = 0;
     int number_of_spaces = 0;
     PacketLog* temp_logs = (PacketLog*) malloc(sizeof(PacketLog));
+    if (temp_logs == NULL) {
+        printf("An error occured while allocating memory for logs\n");
+        return -1;
+    }
     PacketLog temp_log;
-    struct sockaddr_in temp_socket;
     char* ip_addr = '\0';
     char* number_of_packets = '\0';
     char* interface_name = '\0';
@@ -36,10 +39,14 @@ int read_log(FILE* logfile, PacketLog** packet_logs, int* top_index) {
             temp_logs[*top_index] = temp_log;
             (*top_index)++;
             temp_logs = (PacketLog*) realloc(temp_logs, sizeof(temp_logs) * 2);
+            if (temp_logs == NULL) {
+                printf("An error occured while reallocating memory for logs\n");
+                return -1;
+            }
             number_of_spaces = 0;
             continue;
         }
-        
+
         if (temp_char == ' ') {
             number_of_spaces++;
             continue;    
@@ -54,11 +61,13 @@ int read_log(FILE* logfile, PacketLog** packet_logs, int* top_index) {
             strncat(interface_name, &temp_char, 1);
         }
     }
+    *packet_logs = temp_logs;
+    return 1;
 
 }
 
 int add_log(PacketLog** packet_logs, PacketLog new_packet, int* array_top_index) {
-    int index_of_log = search_log(packet_logs, new_packet, 0, *array_top_index - 1);
+    int index_of_log = search_log(*packet_logs, new_packet, 0, *array_top_index - 1);
     if (index_of_log == -1) {
         *packet_logs = (PacketLog*) realloc(packet_logs, sizeof(packet_logs) * 2);
         (*packet_logs)[*array_top_index] = new_packet;
@@ -78,10 +87,10 @@ int search_log(PacketLog* packet_logs, PacketLog searched_packet, int left_bound
             return middle;
         }
    
-        if (strcpm(packet_logs[middle].ip, searched_packet.ip) > 0) {
-            return binarySearch(packet_logs, searched_packet, left_bound, middle - 1);
+        if (strcmp(packet_logs[middle].ip, searched_packet.ip) > 0) {
+            return search_log(packet_logs, searched_packet, left_bound, middle - 1);
         } 
-        return binarySearch(packet_logs, searched_packet, middle + 1, right_bound); 
+        return search_log(packet_logs, searched_packet, middle + 1, right_bound); 
     }
   
     // no packets found 
