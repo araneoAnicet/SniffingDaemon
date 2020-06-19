@@ -13,7 +13,7 @@ typedef struct {
 
 PacketLog packet_logs[PACKETS_BUFFER_SIZE];
 
-int log_status(
+int save_log(
     FILE* logfile,
     char ip_addr[],
     int amount_of_packets,

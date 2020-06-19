@@ -1,7 +1,6 @@
 #include "Sniffer.h"
 
 int get_interface_addr_by_name(Sniffer* sniffer, struct sockaddr** interface_addr) {
-    struct sockaddr* result;
     struct ifaddrs* interfaces;
     struct ifaddrs* current_interface;
     if (getifaddrs(&interfaces) == -1) {
@@ -27,7 +26,6 @@ int create_sniffer_socket(Sniffer* sniffer) {
         sniffer->socket.type,
         sniffer->socket.protocol
         );
-
     if (socket_fd < 0) {
         printf("An error occured while creating a sniffer socket\n");
         return -1;
@@ -38,7 +36,6 @@ int create_sniffer_socket(Sniffer* sniffer) {
         printf("An error occured while getting interface name size");
         return -1;
     }
-
     if (setsockopt(socket_fd, SOL_SOCKET, SO_BINDTODEVICE, sniffer->socket.interface_name, opt_len) == -1) {
         printf("An error occured while binding\n");
         return -1;
@@ -82,31 +79,44 @@ inline void print_headers(struct ethhdr* eth, struct iphdr* iph) {
 
 int sniff(Sniffer* sniffer) {
     int buffer_length;
-    struct sockaddr_ll source_addr;
+    int amount_of_packets = 1;  // total number of packets
+    struct sockaddr_in source_socket;  // only for converting ip header to string
+    struct sockaddr_ll source_addr;  // only for determinating packets type
     socklen_t source_addr_len = sizeof(source_addr);
     struct ethhdr* eth_headers;
     struct iphdr* ip_headers;
-
+    char* ip_addr;  // string of ip address
+    FILE* logfile = fopen(LOG_FILE_NAME, "w");
+    if (logfile == NULL) {
+        printf("An erro occured while openning log file\n");
+        return -1;
+    }
     
     while (1) {
         buffer_length = recvfrom(
-        sniffer->socket.fd,
-        sniffer->socket.buffer,
-        sniffer->socket.buffer_size,
-        0,
-        (struct sockaddr*) &source_addr,
-        &source_addr_len
+            sniffer->socket.fd,
+            sniffer->socket.buffer,
+            sniffer->socket.buffer_size,
+            0,
+            (struct sockaddr*) &source_addr,
+            &source_addr_len
         );
-
         if (buffer_length < 0) {
             printf("An error occured while receiving packets\n");
             close_sniffer_socket(sniffer);
             return -1;
         }
-        if (source_addr.sll_pkttype == PACKET_HOST) {
+        if (source_addr.sll_pkttype == PACKET_HOST) {  // if packets are incoming
             eth_headers = (struct ethhdr*) sniffer->socket.buffer;
             ip_headers = (struct iphdr*) (sniffer->socket.buffer + sizeof(struct ethhdr));
+
+            // getting ip from ip header and converting to string
+            source_socket.sin_addr.s_addr = ip_headers->saddr;
+            ip_addr = inet_ntoa(source_socket.sin_addr);
+            save_log(logfile, ip_addr, amount_of_packets, sniffer->socket.interface_name);
+            amount_of_packets++;
             print_headers(eth_headers, ip_headers);
         }
     }
+    fclose(logfile);
 }

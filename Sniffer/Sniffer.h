@@ -11,6 +11,7 @@
 #include <ifaddrs.h>
 #include <net/if.h>
 #include <sys/ioctl.h>
+#include "Logger.h"
 
 #define DEFAULT_BUFFER_SIZE 65536
 

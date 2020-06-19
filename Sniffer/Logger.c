@@ -1,6 +1,6 @@
 #include "Logger.h"
 
-int log_status(
+int save_log(
     FILE* logfile,
     char ip_addr[],
     int amount_of_packets,
