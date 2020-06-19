@@ -1,7 +1,12 @@
 #pragma once
 #include <stdio.h>
 
-#define LOG_FILE_NAME "NetworkLogs.txt"
 
+#define LOG_FILE_NAME "NetworkSniffingLogs.log"
 
-void log_stats();
+int log_status(
+    FILE* logfile,
+    char ip_addr[],
+    int amount_of_packets,
+    char* interface_name
+);
