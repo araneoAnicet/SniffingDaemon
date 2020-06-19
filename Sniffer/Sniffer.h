@@ -7,6 +7,7 @@
 #include <arpa/inet.h>
 #include <string.h>
 #include <linux/if_ether.h>
+#include <linux/if_packet.h>
 #include <ifaddrs.h>
 #include <net/if.h>
 #include <sys/ioctl.h>

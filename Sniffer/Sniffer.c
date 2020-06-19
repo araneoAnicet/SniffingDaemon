@@ -22,7 +22,6 @@ int get_interface_addr_by_name(Sniffer* sniffer, struct sockaddr** interface_add
 }
 
 int create_sniffer_socket(Sniffer* sniffer) {
-    //struct sockaddr* interface_socket_addr;
     int socket_fd = socket(
         sniffer->socket.domain,
         sniffer->socket.type,
@@ -83,10 +82,11 @@ inline void print_headers(struct ethhdr* eth, struct iphdr* iph) {
 
 int sniff(Sniffer* sniffer) {
     int buffer_length;
-    struct sockaddr source_addr;
-    int source_addr_len = sizeof(source_addr);
+    struct sockaddr_ll source_addr;
+    socklen_t source_addr_len = sizeof(source_addr);
     struct ethhdr* eth_headers;
     struct iphdr* ip_headers;
+
     
     while (1) {
         buffer_length = recvfrom(
@@ -94,8 +94,8 @@ int sniff(Sniffer* sniffer) {
         sniffer->socket.buffer,
         sniffer->socket.buffer_size,
         0,
-        &source_addr,
-        (socklen_t*) &source_addr_len
+        (struct sockaddr*) &source_addr,
+        &source_addr_len
         );
 
         if (buffer_length < 0) {
@@ -103,9 +103,10 @@ int sniff(Sniffer* sniffer) {
             close_sniffer_socket(sniffer);
             return -1;
         }
-
-        eth_headers = (struct ethhdr*) sniffer->socket.buffer;
-        ip_headers = (struct iphdr*) (sniffer->socket.buffer + sizeof(struct ethhdr));
-        print_headers(eth_headers, ip_headers);
+        if (source_addr.sll_pkttype == PACKET_HOST) {
+            eth_headers = (struct ethhdr*) sniffer->socket.buffer;
+            ip_headers = (struct iphdr*) (sniffer->socket.buffer + sizeof(struct ethhdr));
+            print_headers(eth_headers, ip_headers);
+        }
     }
 }
