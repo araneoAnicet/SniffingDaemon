@@ -3,6 +3,15 @@
 
 
 #define LOG_FILE_NAME "NetworkSniffingLogs.log"
+#define PACKETS_BUFFER_SIZE 1024
+
+typedef struct {
+    char* ip;
+    char* interface;
+    int amount_of_packets;
+} PacketLog;
+
+PacketLog packet_logs[PACKETS_BUFFER_SIZE];
 
 int log_status(
     FILE* logfile,
@@ -10,3 +19,4 @@ int log_status(
     int amount_of_packets,
     char* interface_name
 );
+
