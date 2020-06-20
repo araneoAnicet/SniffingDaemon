@@ -16,12 +16,18 @@ typedef struct {
 
 int save_log(
     FILE* logfile,
-    char ip_addr[],
+    char* ip_addr,
     int amount_of_packets,
     char* interface_name
 );
 
-// removes .log file and replaces it with a new .log file
+
+// A dynamically allocated array of packet logs.
+void create_packet_logs_vector(PacketLog* packet_logs[], int* size);
+void packet_logs_append(PacketLog* packet_logs[], int* size, PacketLog new_packet);
+
+
+// removes an old .log file and replaces it with a new .log file
 int rewrite_logs(char* logfile_name, PacketLog* packet_logs, int top_index);
 
 // not asigned pointer of packet_logs and top_index should be given as an argument.
