@@ -30,10 +30,25 @@ int save_log(
 }
 
 
-int search_log(PacketLog* packet_logs, PacketLog searched_packet, int left_bound, int right_bound) { 
-    int middle;
+int search_log(PacketLog packet_logs[], PacketLog searched_packet, int left_bound, int right_bound) { 
+    if (right_bound < left_bound) {
+        return -1;
+    }
+    int middle = (right_bound + left_bound) / 2;
     printf("Entered search log\n");
-    
+    int comparison_result = strcmp(packet_logs[middle].ip, searched_packet.ip); 
+    if (comparison_result == 0) {
+        return middle;
+    }
+
+    if (comparison_result < 0) {
+        return search_log(packet_logs, searched_packet, middle + 1, right_bound);
+    }
+
+    if (comparison_result > 0) {
+        return search_log(packet_logs, searched_packet, left_bound, middle - 1);
+    }
+    /*
     if (right_bound >= left_bound) { 
         middle = left_bound + (right_bound - left_bound) / 2; 
         if (strcmp(packet_logs[middle].ip, searched_packet.ip) == 0) {
@@ -47,9 +62,8 @@ int search_log(PacketLog* packet_logs, PacketLog searched_packet, int left_bound
         } 
         return search_log(packet_logs, searched_packet, middle + 1, right_bound); 
     }
-  
+    */
     // no packets found 
-    return -1; 
 }
 
 int sort_logs(PacketLog* packet_logs, int top_index) {

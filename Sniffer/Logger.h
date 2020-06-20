@@ -38,7 +38,7 @@ int read_log(PacketLog* packet_logs[], int* size, FILE* logfile);
 int add_log(PacketLog* packet_logs[], int* size, PacketLog new_packet);
 
 // binary search. Returns an id of the searched packet. Returns -1 if the packet wasn't found.
-// left_bound should be equal to 0, right_bound should be equal to the index of the element at the top
+// left_bound should be equal to 0, right_bound should be equal to the index of the element at the top (size - 1)
 int search_log(PacketLog packet_logs[], PacketLog searched_packet, int left_bound, int right_bound);
 
 // quick sort. last_log_index should be equal to the index of the last added element
