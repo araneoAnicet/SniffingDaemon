@@ -36,7 +36,7 @@ int search_log(PacketLog* packet_logs, PacketLog searched_packet, int left_bound
     
     if (right_bound >= left_bound) { 
         middle = left_bound + (right_bound - left_bound) / 2; 
-        if (strcmp((packet_logs[middle]).ip, searched_packet.ip) == 0) {
+        if (strcmp(packet_logs[middle].ip, searched_packet.ip) == 0) {
             // FIX HERE! DOES NOT REACHb                                                                     n                                                                                                                 rgftb
             printf("After strcmp\n");
             return middle;
