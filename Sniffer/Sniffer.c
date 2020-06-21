@@ -7,17 +7,17 @@ int create_sniffer_socket(Sniffer* sniffer) {
         sniffer->socket.protocol
         );
     if (socket_fd < 0) {
-        printf("An error occured while creating a sniffer socket\n");
+        printf("An error occurred while creating a sniffer socket\n");
         return -1;
     }
     
     socklen_t opt_len = strnlen(sniffer->socket.interface_name, IF_NAMESIZE);
     if (opt_len == IF_NAMESIZE) {
-        printf("An error occured while getting interface name size");
+        printf("An error occurred while getting interface name size");
         return -1;
     }
     if (setsockopt(socket_fd, SOL_SOCKET, SO_BINDTODEVICE, sniffer->socket.interface_name, opt_len) == -1) {
-        printf("An error occured while binding\n");
+        printf("An error occurred while binding\n");
         return -1;
     }
     sniffer->socket.fd = socket_fd;
@@ -38,12 +38,22 @@ int sniff(Sniffer* sniffer) {
     struct sockaddr_ll source_addr;  // only for determinating packets type
     socklen_t source_addr_len = sizeof(source_addr);
     struct iphdr* ip_headers;
+    FILE* logfile;
 
     PacketLog* packet_logs;
     PacketLog new_packet_log;
     int packet_logs_size;
     int searched_index;
+    
     create_packet_logs_vector(&packet_logs, &packet_logs_size);
+
+    logfile = fopen(LOG_FILE_NAME, "r");
+    if (logfile != NULL) {
+        if (read_logs(&packet_logs, &packet_logs_size, logfile) == -1) {
+            printf("An error occurred while reading logs\n");
+            return -1;
+        }
+    }
     
     while (1) {
         buffer_length = recvfrom(
@@ -55,7 +65,7 @@ int sniff(Sniffer* sniffer) {
             &source_addr_len
         );
         if (buffer_length < 0) {
-            printf("An error occured while receiving packets\n");
+            printf("An error occurred while receiving packets\n");
             close_sniffer_socket(sniffer);
             return -1;
         }
@@ -78,9 +88,9 @@ int sniff(Sniffer* sniffer) {
             }
 
             // updating log file
-            FILE* logfile = fopen(LOG_FILE_NAME, "w");
+            logfile = fopen(LOG_FILE_NAME, "w");
             if (logfile == NULL) {
-                printf("An erro occured while openning log file\n");
+                printf("An erro occurred while openning log file\n");
                 return -1;
             }
             if (save_logs(logfile, packet_logs, packet_logs_size)) {
