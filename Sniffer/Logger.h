@@ -19,11 +19,20 @@ typedef struct {
     int amount_of_packets;
 } PacketLog;
 
+// saves a packet log into log file
 int save_log(
     FILE* logfile,
     struct in_addr ip_addr,
     int amount_of_packets,
     char* interface_name
+);
+
+
+// saves packet logs from packet_logs array into log file
+int save_logs(
+    FILE* logfile,
+    PacketLog* packet_logs,
+    int size
 );
 
 

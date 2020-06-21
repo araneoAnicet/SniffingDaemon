@@ -19,10 +19,19 @@ int save_log(
     char* interface_name
     ) {
     if (fprintf(logfile, "%s\n%d\n%s\n", inet_ntoa(ip_addr), amount_of_packets, interface_name) < 0) {
-        printf("An error occured while logging\n");
+        printf("An error occured while saving logs\n");
         return -1;
     }
     fflush(logfile);
+    return 0;
+}
+
+int save_logs(FILE* logfile, PacketLog* packet_logs, int size) {
+    for (int i = 0; i < size; i++) {
+        if (save_log(logfile, packet_logs[i].ip, packet_logs[i].amount_of_packets, packet_logs[i].interface) == -1) {
+            return -1;
+        }
+    }
     return 0;
 }
 
