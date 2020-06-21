@@ -18,7 +18,7 @@ int save_log(
     int amount_of_packets,
     char* interface_name
     ) {
-    if (fprintf(logfile, "%d %s %s\n", amount_of_packets, ip_addr, interface_name) < 0) {
+    if (fprintf(logfile, "%s\n%d\n%s\n", inet_ntoa(ip_addr), amount_of_packets, interface_name) < 0) {
         printf("An error occured while logging\n");
         return -1;
     }
