@@ -1,25 +1,5 @@
 #include "Sniffer.h"
 
-int get_interface_addr_by_name(Sniffer* sniffer, struct sockaddr** interface_addr) {
-    struct ifaddrs* interfaces;
-    struct ifaddrs* current_interface;
-    if (getifaddrs(&interfaces) == -1) {
-        printf("An error occured while getting interfaces information\n");
-        return -1;
-    }
-    current_interface = interfaces;
-    while (current_interface != NULL) {
-        if (strcmp(current_interface->ifa_name, sniffer->socket.interface_name) == 0) {
-            *interface_addr = current_interface->ifa_addr;
-            freeifaddrs(interfaces);
-            return 0;  // interface address found
-        }
-        current_interface = current_interface->ifa_next;
-    }
-    freeifaddrs(interfaces);
-    return 1;  // no interface with this name found
-}
-
 int create_sniffer_socket(Sniffer* sniffer) {
     int socket_fd = socket(
         sniffer->socket.domain,
@@ -52,35 +32,9 @@ void close_sniffer_socket(Sniffer* sniffer) {
     printf("Sniffer is removed successfully!\n");
 }
 
-inline void print_headers(struct ethhdr* eth, struct iphdr* iph) {
-    int i;
-    int total_number_of_packets = 0;
-    struct sockaddr_in source_socket, destination_socket;
-    memset(&source_socket, 0, sizeof(source_socket));
-    memset(&destination_socket, 0, sizeof(destination_socket));
-    source_socket.sin_addr.s_addr = iph->saddr;
-    destination_socket.sin_addr.s_addr = iph->daddr;
-    printf("\n\n PACKET\n");
-    printf("\t Source:\n");
-    printf("\t\tMAC: ");
-    for (i = 0; i < 5; i++) {
-        printf("%.2X-", eth->h_source[i]);
-    }
-    printf("%.2X\n", eth->h_source[5]);
-    printf("\t\tIP: %s\n", inet_ntoa(source_socket.sin_addr));
-    printf("\t Destination:\n");
-    printf("\t\tMAC: ");
-    for (i = 0; i < 5; i++) {
-        printf("%.2X-", eth->h_dest[i]);
-    }
-    printf("%.2X\n", eth->h_dest[5]);
-    printf("\t\tIP: %s\n", inet_ntoa(destination_socket.sin_addr));
-    printf("\t Protocol : %d\n",eth->h_proto);
-}
 
 int sniff(Sniffer* sniffer) {
     int buffer_length;
-    struct sockaddr_in source_socket;  // only for converting ip header to string
     struct sockaddr_ll source_addr;  // only for determinating packets type
     socklen_t source_addr_len = sizeof(source_addr);
     struct iphdr* ip_headers;
@@ -88,10 +42,7 @@ int sniff(Sniffer* sniffer) {
     PacketLog* packet_logs;
     PacketLog new_packet_log;
     int packet_logs_size;
-    int i;
-    int v = 0;
     int searched_index;
-    int total_num_of_packets = 0;
     create_packet_logs_vector(&packet_logs, &packet_logs_size);
 
     FILE* logfile = fopen(LOG_FILE_NAME, "w");
@@ -100,7 +51,7 @@ int sniff(Sniffer* sniffer) {
         return -1;
     }
     
-    while (total_num_of_packets < 500) {
+    while (1) {
         buffer_length = recvfrom(
             sniffer->socket.fd,
             sniffer->socket.buffer,
@@ -131,9 +82,6 @@ int sniff(Sniffer* sniffer) {
                 
             }
         }
-    }
-    for (i = 0; i < packet_logs_size; i++) {
-        printf("IP: %s -> %d\n", inet_ntoa(packet_logs[i].ip), packet_logs[i].amount_of_packets);
     }
     free(packet_logs);
     printf("Removed packet logs from memory\n");
