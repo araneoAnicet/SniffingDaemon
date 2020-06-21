@@ -3,20 +3,22 @@
 #include <stdlib.h>
 #include <string.h>
 #include <netinet/in.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
 
 
 #define LOG_FILE_NAME "NetworkSniffing.log"
 #define PACKETS_BUFFER_SIZE 1024
 
 typedef struct {
-    char* ip;
+    struct in_addr ip;
     char* interface;
     int amount_of_packets;
 } PacketLog;
 
 int save_log(
     FILE* logfile,
-    char* ip_addr,
+    struct in_addr ip_addr,
     int amount_of_packets,
     char* interface_name
 );
@@ -46,4 +48,4 @@ int sort_logs(PacketLog packet_logs[], int size);
 
 // compares IP addresses of 2 packets. function exists to ensure qsort function works correctly
 // returns the result of strcmp function with IP addresses given as the arguments
-int compare_logs(PacketLog first_log, PacketLog second_log);
+int compare_logs(const PacketLog* first_log, const PacketLog* second_log);
