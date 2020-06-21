@@ -26,6 +26,38 @@ int save_log(
     return 0;
 }
 
+int read_log(PacketLog* packet_logs[], int* size, FILE* logfile) {
+    int line_index = 0;
+    PacketLog temp_log;
+    struct in_addr temp_addr;
+    int in_addr_status;
+    char* line = NULL;
+    size_t len = 0;
+    ssize_t read;
+    while ((read = getline(&line, &len, logfile)) != -1) {
+        if (line_index == IP_LINE_INDEX) {
+            line[strlen(line) - 1] = 0;  // removing '\n' char at the end
+            in_addr_status = inet_aton(line, &temp_addr);
+            if (in_addr_status == -1) {
+                printf("An error occured while parsing .log file IP address\n");
+                return -1;
+            }
+            temp_log.ip.s_addr = temp_addr.s_addr;
+        }
+        if (line_index == PACKETS_LINE_INDEX) {
+            temp_log.amount_of_packets = atoi(line);
+        }
+        if (line_index == INTERFACE_LINE_INDEX) {
+            line[strlen(line) - 1] = 0;
+            temp_log.interface = line;
+            line_index = IP_LINE_INDEX;
+            packet_logs_append(packet_logs, size, temp_log);
+            continue;
+        }
+        line_index++;
+    }
+}
+
 
 int search_log(PacketLog packet_logs[], PacketLog searched_packet, int left_bound, int right_bound) { 
     if (right_bound < left_bound) {
