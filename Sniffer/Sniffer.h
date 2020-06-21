@@ -29,7 +29,8 @@ typedef struct SnifferSocket SnifferSocket;
 
 struct Sniffer {
     SnifferSocket socket;
-
+    PacketLog* packet_logs;  // an array of packets
+    int packet_logs_size;
 };
 
 typedef struct Sniffer Sniffer;
