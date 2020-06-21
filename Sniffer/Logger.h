@@ -5,9 +5,11 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <time.h>
 
 
 #define LOG_FILE_NAME "NetworkSniffing.log"
+#define ERRORS_LOG_FILE_NAME "Errors.log"
 #define PACKETS_BUFFER_SIZE 1024
 #define IP_LINE_INDEX 0
 #define PACKETS_LINE_INDEX 1
@@ -35,6 +37,8 @@ int save_logs(
     int size
 );
 
+// logs errors into .log file
+void error_log(char* error_message);
 
 // A dynamically allocated array of packet logs.
 void create_packet_logs_vector(PacketLog* packet_logs[], int* size);

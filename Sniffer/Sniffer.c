@@ -7,17 +7,17 @@ int create_sniffer_socket(Sniffer* sniffer) {
         sniffer->socket.protocol
         );
     if (socket_fd < 0) {
-        printf("An error occurred while creating a sniffer socket\n");
+        error_log("An error occurred while creating a sniffer socket\n");
         return -1;
     }
     
     socklen_t opt_len = strnlen(sniffer->socket.interface_name, IF_NAMESIZE);
     if (opt_len == IF_NAMESIZE) {
-        printf("An error occurred while getting interface name size");
+        error_log("An error occurred while getting interface name size");
         return -1;
     }
     if (setsockopt(socket_fd, SOL_SOCKET, SO_BINDTODEVICE, sniffer->socket.interface_name, opt_len) == -1) {
-        printf("An error occurred while binding\n");
+        error_log("An error occurred while binding\n");
         return -1;
     }
     sniffer->socket.fd = socket_fd;
@@ -29,7 +29,7 @@ int create_sniffer_socket(Sniffer* sniffer) {
 void close_sniffer_socket(Sniffer* sniffer) {
     close(sniffer->socket.fd);
     free(sniffer->socket.buffer);
-    printf("Sniffer is removed successfully!\n");
+    error_log("Sniffer is removed successfully!\n");
 }
 
 
@@ -50,7 +50,7 @@ int sniff(Sniffer* sniffer) {
     logfile = fopen(LOG_FILE_NAME, "r");
     if (logfile != NULL) {
         if (read_logs(&packet_logs, &packet_logs_size, logfile) == -1) {
-            printf("An error occurred while reading logs\n");
+            error_log("An error occurred while reading logs\n");
             return -1;
         }
     }
@@ -65,7 +65,7 @@ int sniff(Sniffer* sniffer) {
             &source_addr_len
         );
         if (buffer_length < 0) {
-            printf("An error occurred while receiving packets\n");
+            error_log("An error occurred while receiving packets\n");
             close_sniffer_socket(sniffer);
             return -1;
         }
@@ -90,7 +90,7 @@ int sniff(Sniffer* sniffer) {
             // updating log file
             logfile = fopen(LOG_FILE_NAME, "w");
             if (logfile == NULL) {
-                printf("An erro occurred while openning log file\n");
+                error_log("An erro occurred while openning log file\n");
                 return -1;
             }
             if (save_logs(logfile, packet_logs, packet_logs_size)) {
@@ -100,5 +100,5 @@ int sniff(Sniffer* sniffer) {
         }
     }
     free(packet_logs);
-    printf("Removed packet logs from memory\n");
+    error_log("Removed packet logs from memory\n");
 }

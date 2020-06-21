@@ -19,7 +19,7 @@ int save_log(
     char* interface_name
     ) {
     if (fprintf(logfile, "%s\n%d\n%s\n", inet_ntoa(ip_addr), amount_of_packets, interface_name) < 0) {
-        printf("An error occurred while saving logs\n");
+        error_log("An error occurred while saving logs\n");
         return -1;
     }
     fflush(logfile);
@@ -35,6 +35,17 @@ int save_logs(FILE* logfile, PacketLog* packet_logs, int size) {
     return 0;
 }
 
+void error_log(char* error_message) {
+    FILE* logfile = fopen(ERRORS_LOG_FILE_NAME, "a");
+    time_t rawtime;
+    struct tm * timeinfo;
+    time ( &rawtime );
+    timeinfo = localtime ( &rawtime );
+    fprintf("%s\t--\t%s", error_message, asctime (timeinfo));
+    fflush(logfile);
+    fclose(logfile);
+}
+
 int read_logs(PacketLog* packet_logs[], int* size, FILE* logfile) {
     int line_index = 0;
     PacketLog temp_log;
@@ -48,7 +59,7 @@ int read_logs(PacketLog* packet_logs[], int* size, FILE* logfile) {
             line[strlen(line) - 1] = 0;  // removing '\n' char at the end
             in_addr_status = inet_aton(line, &temp_addr);
             if (in_addr_status == -1) {
-                printf("An error occurred while parsing .log file IP address\n");
+                error_log("An error occurred while parsing .log file IP address\n");
                 return -1;
             }
             temp_log.ip.s_addr = temp_addr.s_addr;
