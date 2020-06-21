@@ -3,5 +3,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 
-static void skeleton_daemon();
+void skeleton_daemon();

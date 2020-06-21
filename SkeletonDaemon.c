@@ -1,7 +1,6 @@
-#include "skeleton_daemon.h"
+#include "SkeletonDaemon.h"
 
-static void skeleton_daemon()
-{
+ void skeleton_daemon() {
     pid_t pid; 
     pid_t sid;
 
