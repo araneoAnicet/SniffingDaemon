@@ -44,12 +44,6 @@ int sniff(Sniffer* sniffer) {
     int packet_logs_size;
     int searched_index;
     create_packet_logs_vector(&packet_logs, &packet_logs_size);
-
-    FILE* logfile = fopen(LOG_FILE_NAME, "w");
-    if (logfile == NULL) {
-        printf("An erro occured while openning log file\n");
-        return -1;
-    }
     
     while (1) {
         buffer_length = recvfrom(
@@ -65,7 +59,7 @@ int sniff(Sniffer* sniffer) {
             close_sniffer_socket(sniffer);
             return -1;
         }
-        if (source_addr.sll_pkttype == PACKET_HOST) {  // if packets are incoming
+        if (source_addr.sll_pkttype == PACKET_HOST) {
             ip_headers = (struct iphdr*) (sniffer->socket.buffer + sizeof(struct ethhdr));
 
             // getting ip from ip header and converting to string
@@ -75,15 +69,26 @@ int sniff(Sniffer* sniffer) {
 
             searched_index = search_log(packet_logs, new_packet_log, 0, packet_logs_size - 1);
             if (searched_index == -1) {
+                // if there is new IP address
                 packet_logs_append(&packet_logs, &packet_logs_size, new_packet_log);
                 sort_logs(packet_logs, packet_logs_size);
             } else {
+                // if this IP address has already sent any packets
                 packet_logs[searched_index].amount_of_packets += 1;
-                
             }
+
+            // updating log file
+            FILE* logfile = fopen(LOG_FILE_NAME, "w");
+            if (logfile == NULL) {
+                printf("An erro occured while openning log file\n");
+                return -1;
+            }
+            if (save_logs(logfile, packet_logs, packet_logs_size)) {
+                return -1;
+            }
+            fclose(logfile);
         }
     }
     free(packet_logs);
     printf("Removed packet logs from memory\n");
-    fclose(logfile);
 }
