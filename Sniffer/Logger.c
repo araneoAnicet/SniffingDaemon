@@ -35,7 +35,7 @@ int save_logs(FILE* logfile, PacketLog* packet_logs, int size) {
     return 0;
 }
 
-int read_log(PacketLog* packet_logs[], int* size, FILE* logfile) {
+int read_logs(PacketLog* packet_logs[], int* size, FILE* logfile) {
     int line_index = 0;
     PacketLog temp_log;
     struct in_addr temp_addr;

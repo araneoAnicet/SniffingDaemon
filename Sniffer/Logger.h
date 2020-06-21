@@ -44,7 +44,7 @@ void packet_logs_append(PacketLog* packet_logs[], int* size, PacketLog new_packe
 
 // not asigned pointer of packet_logs and top_index should be given as arguments.
 // the function reads the logfile. returns packet_logs array and top_index
-int read_log(PacketLog* packet_logs[], int* size, FILE* logfile);
+int read_logs(PacketLog* packet_logs[], int* size, FILE* logfile);
 
 // adds a new packet to packet_logs array
 int add_log(PacketLog* packet_logs[], int* size, PacketLog new_packet);
