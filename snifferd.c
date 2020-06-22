@@ -83,6 +83,45 @@ void termination_handler(int sig) {
 }
 
 
+int start_background_process() {
+    pid_t pid; 
+    pid = fork();
+    if (pid < 0) {
+        printf("\033[31m");
+        printf("Failed to create child process\n");
+        exit(EXIT_FAILURE);
+        printf("\033[0m");
+    }
+
+    // child
+    if (pid == 0) {
+        pid_t sid = setsid();
+        if (sid < 0) {
+            printf("Failed to set a new session\n");
+            exit(EXIT_FAILURE);
+        }
+        umask(0);
+        chdir("/");
+        close(STDIN_FILENO);
+        close(STDOUT_FILENO);
+        close(STDERR_FILENO);
+        signal(SIGTERM, termination_handler);
+        signal(SIGUSR1, ip_stats_handler);
+
+        create_sniffer_socket(global_sniffer);
+        sniff(global_sniffer);
+        close_sniffer_socket(global_sniffer);
+        return 0;
+        } else if (pid > 0) {  // parent
+                printf("\033[0;32m");
+                printf("%s sniffing is activated\n", global_sniffer->socket.interface_name);
+                printf("\033[0m");
+                printf("Type `stat %s` to see the statistics\n", global_sniffer->socket.interface_name);
+                return 0;
+        }
+}
+
+
 int main(int argc, char* argv[]) {
     if (check_folder()) {
         printf("Error: could not create a folder\n");
@@ -108,42 +147,8 @@ int main(int argc, char* argv[]) {
     if (strcmp(argv[1], "start") == 0) {
         if (start() == 0) {
 
-            // creating background process
-            pid_t pid; 
-            pid = fork();
-            if (pid < 0) {
-                printf("\033[31m");
-                printf("Failed to create child process\n");
-                exit(EXIT_FAILURE);
-                printf("\033[0m");
-            }
+            start_background_process();
             
-            // child
-            if (pid == 0) {
-                pid_t sid = setsid();
-                if (sid < 0) {
-                    printf("Failed to set a new session\n");
-                    exit(EXIT_FAILURE);
-                }
-                umask(0);
-                chdir("/");
-                close(STDIN_FILENO);
-                close(STDOUT_FILENO);
-                close(STDERR_FILENO);
-                signal(SIGTERM, termination_handler);
-                signal(SIGUSR1, ip_stats_handler);
-
-                create_sniffer_socket(&sniffer);
-                sniff(&sniffer);
-                close_sniffer_socket(&sniffer);
-                return 0;
-            } else if (pid > 0) {  // parent
-                printf("\033[0;32m");
-                printf("%s sniffing is activated\n", sniffer.socket.interface_name);
-                printf("\033[0m");
-                printf("Type `stat %s` to see the statistics\n", sniffer.socket.interface_name);
-                return 0;
-            }
         } else {
             printf("\033[31m");
             printf("Error: the process is already running...\n");
@@ -175,8 +180,8 @@ int main(int argc, char* argv[]) {
             printf("\033[0m");
             printf("Type -- help for more details.\n");
             return -1;
+            }
         }
-    }
 
     // show [ip] count command
     if ((strcmp(argv[1], "show") == 0) && (strcmp(argv[3], "count") == 0)) {

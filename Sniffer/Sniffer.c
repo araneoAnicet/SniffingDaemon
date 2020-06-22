@@ -68,7 +68,7 @@ int sniff(Sniffer* sniffer) {
         fflush(logfile);
         fclose(logfile);
     }
-    
+
     printf("After file reading.\n");
     
     while (1) {
