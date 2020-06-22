@@ -1,8 +1,63 @@
 #include "Sniffer/Sniffer.h"
 #include "Sniffer/Logger.h"
-#include "SkeletonDaemon.h"
+#include "UI/CommandLineInterface.h"
 
 int main(int argc, char* argv[]) {
-    
-    return 0;
+    if (check_folder()) {
+        printf("Error: could not create a folder\n");
+        return -1;
+    }
+
+    Sniffer sniffer;
+    sniffer.socket.buffer_size = DEFAULT_BUFFER_SIZE;
+    sniffer.socket.interface_name = "eth0";
+    sniffer.socket.domain = AF_PACKET;
+    sniffer.socket.type = SOCK_RAW;
+    sniffer.socket.protocol = htons(ETH_P_ALL);
+
+    if (argc < 2) {
+        printf("\033[31m");
+        printf("Error: not enough arguments.\n");
+        printf("\033[0m");
+        printf("Type -- help for more details.\n");
+        return -1;
+    }
+    if (strcmp(argv[1], "start") == 0) {
+        if (start() == 0) {
+
+            // creating background process
+            pid_t pid; 
+            pid = fork();
+            if (pid < 0) {
+                printf("\033[31m");
+                printf("Failed to create child process\n");
+                exit(EXIT_FAILURE);
+                printf("\033[0m");
+            }
+            
+            
+            if (pid == 0) {
+                pid_t sid = setsid();
+                if (sid < 0) {
+                    printf("Failed to set a new session\n");
+                    exit(EXIT_FAILURE);
+                }
+                umask(0);
+                chdir("/");
+                close(STDIN_FILENO);
+                close(STDOUT_FILENO);
+                close(STDERR_FILENO);
+                
+                create_sniffer_socket(&sniffer);
+                sniff(&sniffer);
+                close_sniffer_socket(&sniffer);
+                return 0;
+            } else if (pid > 0) {
+                printf("\033[0;32m");
+                printf("%s sniffing is activated\n", sniffer.socket.interface_name);
+                printf("\033[0m");
+                printf("Type stat %s to see the statistics\n", sniffer.socket.interface_name);
+            }
+        }
+    }
 }

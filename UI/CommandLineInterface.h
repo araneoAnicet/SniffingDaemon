@@ -1,8 +1,9 @@
 #pragma once
+#include "../Sniffer/Logger.h"
 
-void start();
-void stop();
-void show(char* ip);
-void select_iface(char* interface);
-void stat(char* interface);
+int start();
+int stop();
+int show(char* ip);
+int select_iface(char* interface);
+int statistics(char* interface);
 void help();
