@@ -195,21 +195,7 @@ int main(int argc, char* argv[]) {
             printf("Before background kill\n");
             kill(get_daemon_pid(), SIGUSR1);
             printf("After background kill\n");
-            while (1);
-            /*
-            printf("RESPONSE ACCEPTED\n");
-            ip_request_file = fopen(IP_REQUEST_LOG, "r");
-            if (ip_request_file == NULL) {
-                printf("NO PACKETS RECEIVED FROM THIS IP\n");
-                return -1;
-            }
-            char* line;
-            size_t len;
-            getline(&line, &len, ip_request_file);
-            fflush(ip_request_file);
-            fclose(ip_request_file);
-            printf("PACKETS RECEIVED FROM THIS IP: %s\n", line);
-            */
+            while (1);  // waiting for interrupt from background process
         }
     }
 }
