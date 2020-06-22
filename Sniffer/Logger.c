@@ -122,3 +122,17 @@ int compare_logs(const PacketLog* first_log, const PacketLog* second_log) {
     }
     return 0;
 }
+
+int check_folder() {
+    DIR* folder = opendir(LOGS_FOLDER);
+    if (folder) {
+        closedir(folder);
+        return 0;
+    } else if (ENOENT == errno) {
+        if (mkdir(LOGS_FOLDER) == -1) {
+            return -1;
+        }
+        return 0;
+    }
+    return -1;
+}

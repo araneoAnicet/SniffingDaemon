@@ -6,10 +6,13 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <time.h>
+#include <dirent.h>
+#include <errno.h>
 
 
 #define LOG_FILE_NAME "NetworkSniffing.log"
 #define ERRORS_LOG_FILE_NAME "Errors.log"
+#define LOGS_FOLDER "/var/log/snifferd"
 #define PACKETS_BUFFER_SIZE 1024
 #define IP_LINE_INDEX 0
 #define PACKETS_LINE_INDEX 1
@@ -36,6 +39,8 @@ int save_logs(
     PacketLog* packet_logs,
     int size
 );
+
+int check_folder();
 
 // logs errors into .log file
 void error_log(char* error_message);
