@@ -68,7 +68,7 @@ int select_iface(char* interface_name) {
             return 0;
         }
         printf("\033[31m");
-        printf("Error: the proccess is already running, stop it to change the interface\n");
+        printf("Error: the process is already running, stop it to change the interface\n");
         printf("\033[0m");
         printf("Type -- help for more details.\n");
         return -1;
@@ -121,4 +121,58 @@ int statistics(char* interface) {
         line_counter++;
     }
     return 0;
+}
+
+void help_start() {
+    printf("START:\n");
+    printf("\033[0;33m");
+    printf("USAGE: snifferd start\n");
+    printf("\033[0m");
+    printf("starts the sniffing process\n");
+    printf("\n");
+}
+
+void help_stop() {
+    printf("STOP:\n");
+    printf("\033[0;33m");
+    printf("USAGE: snifferd stop\n");
+    printf("\033[0m");
+    printf("terminates the running process\n");
+    printf("\n");
+}
+
+
+void help_show() {
+    printf("SHOW:\n");
+    printf("\033[0;33m");
+    printf("USAGE: snifferd show [ip] count\n");
+    printf("\033[0m");
+    printf("shows ip statistics in the running process\n");
+    printf("\n");
+}
+
+void help_select() {
+    printf("SELECT:\n");
+    printf("\033[0;33m");
+    printf("USAGE: snifferd select iface [interface]\n");
+    printf("\033[0m");
+    printf("changes configuration settings. The interface can selected only if process is not running\n");
+    printf("\n");
+}
+
+void help_statistics() {
+    printf("STAT:\n");
+    printf("\033[0;33m");
+    printf("USAGE: snifferd stat [interface]\n");
+    printf("\033[0m");
+    printf("shows the statistics for a particular interface. The statistics is written after process stopping\n");
+    printf("\n");
+}
+void help() {
+    printf("snifferd:\n");
+    help_start();
+    help_stop();
+    help_show();
+    help_select();
+    help_statistics();
 }

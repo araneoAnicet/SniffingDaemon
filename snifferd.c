@@ -146,6 +146,10 @@ int main(int argc, char* argv[]) {
 
     // start command
     if (strcmp(argv[1], "start") == 0) {
+        if (argc == 3 && (strcmp(argv[2], "--help") == 0)) {
+            help_start();
+            return 0;
+        }
         if (start() == 0) {
 
             start_background_process();
@@ -161,6 +165,10 @@ int main(int argc, char* argv[]) {
 
     // stop command
     if (strcmp(argv[1], "stop") == 0) {
+        if (argc == 3 && (strcmp(argv[2], "--help") == 0)) {
+            help_stop();
+            return 0;
+        }
         if (stop() == 0) {
         pid_t daemon_pid = get_daemon_pid();
         if (daemon_pid == -1) {
@@ -188,6 +196,10 @@ int main(int argc, char* argv[]) {
 
     // show [ip] count command
     if ((strcmp(argv[1], "show") == 0)) {
+        if (argc == 3 && (strcmp(argv[2], "--help") == 0)) {
+            help_show();
+            return 0;
+        }
         if (argc == 4) {
             if ((strcmp(argv[3], "count") == 0)) {
                 if (stop() == 0) {
@@ -205,6 +217,10 @@ int main(int argc, char* argv[]) {
 
     // select [iface] command
     if (strcmp(argv[1], "select") == 0) {
+        if (argc == 3 && (strcmp(argv[2], "--help") == 0)) {
+            help_select();
+            return 0;
+        }
         if (argc == 4) {
             if (strcmp(argv[2], "iface") == 0) {
                 return select_iface(argv[3]);
@@ -219,6 +235,10 @@ int main(int argc, char* argv[]) {
 
     // stat [iface] command
     if (strcmp(argv[1], "stat") == 0) {
+        if (argc == 3 && (strcmp(argv[2], "--help") == 0)) {
+            help_statistics();
+            return 0;
+        }
         if (argc == 3) {
             return statistics(argv[2]);
         }
@@ -228,5 +248,14 @@ int main(int argc, char* argv[]) {
         printf("Type -- help for more details.\n");   
         return -1;
     }
+    if (argc == 2 && (strcmp(argv[1], "--help") == 0)) {
+        help();
+        return 0;
+    }
     
+    printf("\033[31m");
+    printf("Error: unknown command\n");
+    printf("\033[0m");
+    printf("Type -- help for more details.\n");
+    return -1;
 }

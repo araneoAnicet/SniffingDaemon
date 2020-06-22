@@ -12,6 +12,7 @@ int select_iface(char* interface_name);
 int statistics(char* interface);
 void help();
 void help_start();
+void help_stop();
 void help_show();
 void help_select();
 void help_statistics();
