@@ -200,4 +200,35 @@ int main(int argc, char* argv[]) {
         printf("Type -- help for more details.\n");
         return -1;
     }
+
+    if (strcmp(argv[1], "select") == 0) {
+        if (argc == 4) {
+            if (strcmp(argv[2], "iface") == 0) {
+                if (check_if_interface_is_available(argv[3]) == 0) {
+                    pid_t pid = get_daemon_pid();
+                    if (pid == -1) {
+                        save_conf(argv[3], 0);  // just changes the configurations
+                        printf("\033[0;32m");
+                        printf("Success! Your current interface is %s\n", argv[3]);
+                        printf("\033[0m");
+                        return 0;
+                    }
+                    printf("\033[31m");
+                    printf("Error: the proccess is already running, stop it to change the interface\n");
+                    printf("\033[0m");
+                    printf("Type -- help for more details.\n");
+                    return -1;
+                }
+                printf("\033[31m");
+                printf("Error: seems like this interface is not available on your machine\n");
+                printf("\033[0m");        
+                return -1;
+            }
+        }
+        printf("\033[31m");
+        printf("Error: did you forget to specify the interface or add a `iface` keyword?\n");
+        printf("\033[0m");
+        printf("Type -- help for more details.\n");
+        return -1;
+    }
 }

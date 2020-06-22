@@ -7,8 +7,44 @@ pid_t get_daemon_pid() {
     }
     char* line = NULL;
     size_t len = 0;
+    ssize_t read;
     getline(&line, &len, conf_file);
-    return atoi(line);
+    pid_t pid = atoi(line);
+    int current_line_index = 1;
+    while ((read = getline(&line, &len, conf_file)) != -1) {
+        if (current_line_index > 0) {
+            if (atoi(line) == 0) {
+                fflush(conf_file);
+                fclose(conf_file);
+                return -1;            
+            }
+            break;
+        }
+        current_line_index++;
+    }
+    fflush(conf_file);
+    fclose(conf_file);
+    return pid;
+}
+
+int check_if_interface_is_available(char* interface_name) {
+    struct ifaddrs* interfaces;
+    struct ifaddrs* current_interface;
+    if (getifaddrs(&interfaces) == -1) {
+        printf("An error occured while getting interfaces information\n");
+        return -1;
+    }
+    current_interface = interfaces;
+    while (current_interface != NULL) {
+        if (strcmp(current_interface->ifa_name, interface_name) == 0) {
+            freeifaddrs(interfaces);
+            return 0;  // interface address found
+        }
+        current_interface = current_interface->ifa_next;
+    }
+    freeifaddrs(interfaces);
+    return -1;  // no interface with this name found
+
 }
 
 int create_sniffer_socket(Sniffer* sniffer) {

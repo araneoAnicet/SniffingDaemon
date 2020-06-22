@@ -12,6 +12,7 @@
 #include <net/if.h>
 #include <sys/ioctl.h>
 #include "Logger.h"
+#include <ifaddrs.h>
 
 #define DEFAULT_BUFFER_SIZE 65536
 
@@ -38,6 +39,7 @@ static Sniffer* global_sniffer;
 
 pid_t get_daemon_pid();
 
+int check_if_interface_is_available(char* interface_name);
 void get_configuration(Sniffer* sniffer);
 int create_sniffer_socket(Sniffer* sniffer);
 void close_sniffer_socket(Sniffer* sniffer);
