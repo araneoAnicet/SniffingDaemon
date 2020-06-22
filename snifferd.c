@@ -1,6 +1,7 @@
 #include "Sniffer/Sniffer.h"
 #include "Sniffer/Logger.h"
 #include "UI/CommandLineInterface.h"
+#include <sys/signal.h>
 
 int main(int argc, char* argv[]) {
     if (check_folder()) {
@@ -22,6 +23,8 @@ int main(int argc, char* argv[]) {
         printf("Type -- help for more details.\n");
         return -1;
     }
+
+    // start command
     if (strcmp(argv[1], "start") == 0) {
         if (start() == 0) {
 
@@ -61,6 +64,26 @@ int main(int argc, char* argv[]) {
         } else {
             printf("\033[31m");
             printf("Error: the process is already running...\n");
+            printf("\033[0m");
+            printf("Type -- help for more details.\n");
+        }
+    }
+
+    // stop command
+    if (strcmp(argv[1], "stop") == 0) {
+        if (stop() == 0) {
+        FILE* conf_file = fopen(CONF_FILE, "r");
+        char* line = NULL;
+        size_t len = 0;
+        int current_line_index = 0;
+        getline(&line, &len, conf_file);
+        kill(atoi(line), SIGTERM);
+        printf("\033[0;32m");
+        printf("The process of sniffing is terminated successfully\n");
+        printf("\033[0m");
+        } else {
+            printf("\033[31m");
+            printf("Error: the process is not running...\n");
             printf("\033[0m");
             printf("Type -- help for more details.\n");
         }
