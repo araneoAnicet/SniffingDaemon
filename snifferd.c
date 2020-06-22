@@ -174,6 +174,8 @@ int main(int argc, char* argv[]) {
         printf("\033[0;32m");
         printf("The process of sniffing is terminated successfully\n");
         printf("\033[0m");
+        printf("Type `snifferd stat [iface]` for statistics.\n");
+        printf("Type -- help for more details.\n");
         return 0;
         } else {
             printf("\033[31m");
