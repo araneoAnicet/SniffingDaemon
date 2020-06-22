@@ -1,6 +1,16 @@
 #include "Sniffer.h"
 
-
+pid_t get_daemon_pid() {
+    FILE* conf_file = fopen(CONF_FILE, "r");
+    if (conf_file == NULL) {
+        return -1;
+    }
+    char* line = NULL;
+    size_t len = 0;
+    int current_line_index = 0;
+    getline(&line, &len, conf_file);
+    return atoi(line);
+}
 
 int create_sniffer_socket(Sniffer* sniffer) {
     int socket_fd = socket(

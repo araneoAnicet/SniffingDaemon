@@ -52,7 +52,8 @@ int main(int argc, char* argv[]) {
                 close(STDOUT_FILENO);
                 close(STDERR_FILENO);
                 signal(SIGTERM, termination_handler);
-                
+                signal(SIGUSR1, ip_stats_handler);
+
                 create_sniffer_socket(&sniffer);
                 sniff(&sniffer);
                 close_sniffer_socket(&sniffer);
@@ -74,12 +75,15 @@ int main(int argc, char* argv[]) {
     // stop command
     if (strcmp(argv[1], "stop") == 0) {
         if (stop() == 0) {
-        FILE* conf_file = fopen(CONF_FILE, "r");
-        char* line = NULL;
-        size_t len = 0;
-        int current_line_index = 0;
-        getline(&line, &len, conf_file);
-        kill(atoi(line), SIGTERM);
+        pid_t daemon_pid = get_daemon_pid();
+        if (daemon_pid == -1) {
+            printf("\033[31m");
+            printf("Error: the process is not running...\n");
+            printf("\033[0m");
+            printf("Type -- help for more details.\n");
+            return -1;
+        }
+        kill(daemon_pid, SIGTERM);
         printf("\033[0;32m");
         printf("The process of sniffing is terminated successfully\n");
         printf("\033[0m");

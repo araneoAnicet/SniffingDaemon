@@ -36,7 +36,7 @@ struct Sniffer {
 typedef struct Sniffer Sniffer;
 static Sniffer* global_sniffer;
 
-void termination_handler(int sig);
+pid_t get_daemon_pid();
 
 int create_sniffer_socket(Sniffer* sniffer);
 void close_sniffer_socket(Sniffer* sniffer);
