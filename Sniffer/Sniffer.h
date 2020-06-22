@@ -38,6 +38,7 @@ static Sniffer* global_sniffer;
 
 pid_t get_daemon_pid();
 
+void get_configuration(Sniffer* sniffer);
 int create_sniffer_socket(Sniffer* sniffer);
 void close_sniffer_socket(Sniffer* sniffer);
 int sniff(Sniffer* sniffer);

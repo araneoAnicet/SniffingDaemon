@@ -43,8 +43,36 @@ void close_sniffer_socket(Sniffer* sniffer) {
     free(sniffer->packet_logs);
 }
 
+void get_configuration(Sniffer* sniffer) {
+    sniffer->socket.buffer_size = DEFAULT_BUFFER_SIZE;
+    sniffer->socket.domain = AF_PACKET;
+    sniffer->socket.type = SOCK_RAW;
+    sniffer->socket.protocol = htons(ETH_P_ALL);
+    FILE* conf_file = fopen(CONF_FILE, "r");
+    if (conf_file == NULL) {
+        sniffer->socket.interface_name = "eth0";
+        return;
+    }
+    char* line = NULL;
+    size_t len = 0;
+    ssize_t read;
+    int current_line_index = 0;
+    while ((read = getline(&line, &len, conf_file)) != -1) {
+        if (current_line_index > 1) {
+            line[strlen(line) - 1] = 0;
+            sniffer->socket.interface_name = line;
+            break;
+        }
+        current_line_index++;
+    }
+    fflush(conf_file);
+    fclose(conf_file);
+}
 
 int sniff(Sniffer* sniffer) {
+    get_configuration(sniffer);  // reads an interface from .conf file
+    
+    // writes its pid, interface and status into .conf file
     save_conf(sniffer->socket.interface_name, 1);
     int buffer_length;
     struct sockaddr_ll source_addr;  // only for determinating packets type
@@ -68,8 +96,6 @@ int sniff(Sniffer* sniffer) {
         fflush(logfile);
         fclose(logfile);
     }
-
-    printf("After file reading.\n");
     
     while (1) {
         buffer_length = recvfrom(

@@ -78,7 +78,7 @@ void termination_handler(int sig) {
     }
     fflush(logfile);
     fclose(logfile);
-    remove(CONF_FILE);
+    save_conf(global_sniffer->socket.interface_name, 0);
     exit(0);
 }
 
@@ -102,9 +102,11 @@ int start_background_process() {
         }
         umask(0);
         chdir("/");
+        
         close(STDIN_FILENO);
         close(STDOUT_FILENO);
         close(STDERR_FILENO);
+        
         signal(SIGTERM, termination_handler);
         signal(SIGUSR1, ip_stats_handler);
 
@@ -114,9 +116,8 @@ int start_background_process() {
         return 0;
         } else if (pid > 0) {  // parent
                 printf("\033[0;32m");
-                printf("%s sniffing is activated\n", global_sniffer->socket.interface_name);
+                printf("Sniffing is activated!\n");
                 printf("\033[0m");
-                printf("Type `stat %s` to see the statistics\n", global_sniffer->socket.interface_name);
                 return 0;
         }
 }
@@ -129,7 +130,7 @@ int main(int argc, char* argv[]) {
     }
     Sniffer sniffer;
     sniffer.socket.buffer_size = DEFAULT_BUFFER_SIZE;
-    sniffer.socket.interface_name = "wlan0";
+    sniffer.socket.interface_name = "eth0";
     sniffer.socket.domain = AF_PACKET;
     sniffer.socket.type = SOCK_RAW;
     sniffer.socket.protocol = htons(ETH_P_ALL);
