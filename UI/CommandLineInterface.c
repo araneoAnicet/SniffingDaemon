@@ -78,3 +78,47 @@ int select_iface(char* interface_name) {
     printf("\033[0m");        
     return -1;
 }
+
+int statistics(char* interface) {
+    if (get_daemon_pid() != -1) {
+        printf("\033[31m");
+        printf("Error: background process is running, you should stop it to see the statistics.\n");
+        printf("\033[0m");
+        return -1;
+    }
+    char path[60];
+    sprintf(path, "%s/%s.log", LOGS_FOLDER, interface);
+    FILE* logfile = fopen(path, "r");
+    if (logfile == NULL) {
+        printf("\033[31m");
+        printf("Error: No logs for such interface\n");
+        printf("\033[0m");
+        return -1;
+    }
+    printf("\033[0;33m");
+    printf("IP -> PACKETS (INTERFACE)\n");
+    printf("\033[0m");
+    char* line = NULL;
+    size_t len = 0;
+    ssize_t read;
+    int line_counter = 0;
+
+    while ((read = getline(&line, &len, logfile)) != -1) {
+        if (line_counter == 0) {
+            line[strlen(line) - 1] = 0;
+            printf("%s ", line);
+        }
+        if (line_counter == 1) {
+            line[strlen(line) - 1] = 0;
+            printf("-> %s ", line);
+        }
+        if (line_counter == 2) {
+            line[strlen(line) - 1] = 0;
+            printf("(%s)\n", line);
+            line_counter = 0;
+            continue;
+        }
+        line_counter++;
+    }
+    return 0;
+}

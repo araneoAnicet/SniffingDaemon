@@ -216,4 +216,17 @@ int main(int argc, char* argv[]) {
         printf("Type -- help for more details.\n");
         return -1;
     }
+
+    // stat [iface] command
+    if (strcmp(argv[1], "stat") == 0) {
+        if (argc == 3) {
+            return statistics(argv[2]);
+        }
+        printf("\033[31m");
+        printf("Error: did you forget to specify the interface\n");
+        printf("\033[0m");
+        printf("Type -- help for more details.\n");   
+        return -1;
+    }
+    
 }
