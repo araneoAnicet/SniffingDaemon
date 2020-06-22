@@ -129,7 +129,7 @@ int check_folder() {
         closedir(folder);
         return 0;
     } else if (ENOENT == errno) {
-        if (mkdir(LOGS_FOLDER) == -1) {
+        if (mkdir(LOGS_FOLDER, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) == -1) {
             return -1;
         }
         return 0;
