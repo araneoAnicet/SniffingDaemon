@@ -41,3 +41,18 @@ int stop() {
         }
         return -1;  // configuration file does not exist
 }
+
+int show(char* ip) {
+    FILE* ip_request_file = fopen(IP_REQUEST_LOG, "w");
+    if (ip_request_file == NULL) {
+        printf("\033[31m");
+        printf("Error: unable to create ip request file...\n");
+        printf("\033[0m");
+        return -1;
+    }
+    fprintf(ip_request_file, "%s\n%d", ip, getpid());
+    fflush(ip_request_file);
+    fclose(ip_request_file);
+    kill(get_daemon_pid(), SIGUSR1);
+    while (1);  // waiting for interrupt from background process
+}

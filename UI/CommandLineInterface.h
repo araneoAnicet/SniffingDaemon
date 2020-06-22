@@ -1,5 +1,6 @@
 #pragma once
 #include "../Sniffer/Logger.h"
+#include "../Sniffer/Sniffer.h"
 #include <sys/signal.h>
 #include <unistd.h>
 

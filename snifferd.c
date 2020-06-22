@@ -180,22 +180,9 @@ int main(int argc, char* argv[]) {
 
     // show [ip] count command
     if ((strcmp(argv[1], "show") == 0) && (strcmp(argv[3], "count") == 0)) {
-        if (stop() == 0) {  // stop function checks if the process is active
+        if (stop() == 0) {
             signal(SIGUSR1, ip_stats_response_handler);  // response from daemon
-            FILE* ip_request_file = fopen(IP_REQUEST_LOG, "w");
-            if (ip_request_file == NULL) {
-                printf("\033[31m");
-                printf("Error: unable to create ip request file...\n");
-                printf("\033[0m");
-                return -1;
-            }
-            fprintf(ip_request_file, "%s\n%d", argv[2], getpid());
-            fflush(ip_request_file);
-            fclose(ip_request_file);
-            printf("Before background kill\n");
-            kill(get_daemon_pid(), SIGUSR1);
-            printf("After background kill\n");
-            while (1);  // waiting for interrupt from background process
+            show(argv[2]);
         }
     }
 }
