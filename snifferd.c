@@ -58,6 +58,11 @@ int main(int argc, char* argv[]) {
                 printf("\033[0m");
                 printf("Type stat %s to see the statistics\n", sniffer.socket.interface_name);
             }
+        } else {
+            printf("\033[31m");
+            printf("Error: the process is already running...\n");
+            printf("\033[0m");
+            printf("Type -- help for more details.\n");
         }
     }
 }

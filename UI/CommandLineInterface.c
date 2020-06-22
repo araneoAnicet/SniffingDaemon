@@ -10,16 +10,12 @@ int start() {
             while ((read = getline(&line, &len, conf_file)) != -1) {
                 if (current_line_index == 1) {
                     if (atoi(line) == 1) {  // process is currently running
-                        printf("\033[31m");
-                        printf("Error: the process is already running...\n");
-                        printf("\033[0m");
-                        printf("Type -- help for more details.\n");
                         return -1;
                     } else {  // process is not running
                         return 0;
                     }
-                    current_line_index++;
                 }
+                current_line_index++;
             }
         }
         return 0;  // configuration file does not exist
