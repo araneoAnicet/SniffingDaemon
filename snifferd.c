@@ -184,10 +184,19 @@ int main(int argc, char* argv[]) {
         }
 
     // show [ip] count command
-    if ((strcmp(argv[1], "show") == 0) && (strcmp(argv[3], "count") == 0)) {
-        if (stop() == 0) {
-            signal(SIGUSR1, ip_stats_response_handler);  // response from daemon
-            show(argv[2]);
+    if ((strcmp(argv[1], "show") == 0)) {
+        if (argc == 4) {
+            if ((strcmp(argv[3], "count") == 0)) {
+                if (stop() == 0) {
+                    signal(SIGUSR1, ip_stats_response_handler);  // response from daemon
+                    show(argv[2]);
+                }
+            }
         }
+        printf("\033[31m");
+        printf("Error: did you forget to specify the interface or add a `count` keyword?\n");
+        printf("\033[0m");
+        printf("Type -- help for more details.\n");
+        return -1;
     }
 }
