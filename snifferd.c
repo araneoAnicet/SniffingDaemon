@@ -14,6 +14,7 @@ int main(int argc, char* argv[]) {
     sniffer.socket.domain = AF_PACKET;
     sniffer.socket.type = SOCK_RAW;
     sniffer.socket.protocol = htons(ETH_P_ALL);
+    global_sniffer = &sniffer;
 
     if (argc < 2) {
         printf("\033[31m");

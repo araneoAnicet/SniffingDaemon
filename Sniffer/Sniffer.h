@@ -34,7 +34,7 @@ struct Sniffer {
 };
 
 typedef struct Sniffer Sniffer;
-
+static Sniffer* global_sniffer;
 
 void termination_handler(int sig);
 
