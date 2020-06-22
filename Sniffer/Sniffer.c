@@ -34,6 +34,7 @@ void close_sniffer_socket(Sniffer* sniffer) {
 
 
 int sniff(Sniffer* sniffer) {
+    save_conf(sniffer->socket.interface_name, 1);
     int buffer_length;
     struct sockaddr_ll source_addr;  // only for determinating packets type
     socklen_t source_addr_len = sizeof(source_addr);
@@ -99,6 +100,6 @@ int sniff(Sniffer* sniffer) {
             fclose(logfile);
         }
     }
-    free(packet_logs);
-    error_log("Removed packet logs from memory\n");
+    //free(packet_logs);
+    
 }
