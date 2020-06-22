@@ -13,8 +13,8 @@
 #include <errno.h>
 
 
-#define LOG_FILE_NAME "NetworkSniffing.log"
-#define ERRORS_LOG_FILE_NAME "Errors.log"
+#define ERRORS_LOG_FILE_NAME "/var/log/snifferd/Errors.log"
+#define IP_REQUEST_LOG "/var/log/snifferd/ip_request.log"
 #define LOGS_FOLDER "/var/log/snifferd"
 #define CONF_FILE "/var/log/snifferd/settings.conf"
 #define PACKETS_BUFFER_SIZE 1024

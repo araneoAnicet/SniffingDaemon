@@ -7,7 +7,6 @@ pid_t get_daemon_pid() {
     }
     char* line = NULL;
     size_t len = 0;
-    int current_line_index = 0;
     getline(&line, &len, conf_file);
     return atoi(line);
 }
@@ -42,7 +41,6 @@ void close_sniffer_socket(Sniffer* sniffer) {
     close(sniffer->socket.fd);
     free(sniffer->socket.buffer);
     free(sniffer->packet_logs);
-    error_log("Sniffer is removed successfully!\n");
 }
 
 
@@ -57,14 +55,21 @@ int sniff(Sniffer* sniffer) {
     int searched_index;
     
     create_packet_logs_vector(&(sniffer->packet_logs), &(sniffer->packet_logs_size));
-
-    logfile = fopen(LOG_FILE_NAME, "r");
+    char logfile_name_buffer[120];
+    sprintf(logfile_name_buffer, "%s/%s.log", LOGS_FOLDER, sniffer->socket.interface_name);
+    logfile = fopen(logfile_name_buffer, "r");
     if (logfile != NULL) {
         if (read_logs(&(sniffer->packet_logs), &(sniffer->packet_logs_size), logfile) == -1) {
             error_log("An error occurred while reading logs\n");
+            fflush(logfile);
+            fclose(logfile);
             return -1;
         }
+        fflush(logfile);
+        fclose(logfile);
     }
+    
+    printf("After file reading.\n");
     
     while (1) {
         buffer_length = recvfrom(
@@ -98,17 +103,6 @@ int sniff(Sniffer* sniffer) {
                 (sniffer->packet_logs)[searched_index].amount_of_packets += 1;
             }
 
-            // saving to log files
-            char logfile_name_buffer[120];
-            sprintf(logfile_name_buffer, "%s/%s.log", LOGS_FOLDER, sniffer->socket.interface_name);
-            logfile = fopen(logfile_name_buffer, "w");
-            if (logfile == NULL) {
-                error_log("An error occurred while opening interface log file\n");
-                return -1;
-            }
-            if (save_logs(logfile, sniffer->packet_logs, sniffer->packet_logs_size)) {
-                return -1;
-            }
         }
     }
 }

@@ -1,10 +1,10 @@
 all: test
 
-daemonize: Sniffer/Sniffer.o Sniffer/Logger.o  snifferd.o UI/CommandLineInterface.o
-	clang -std=gnu99 Sniffer/Sniffer.o Sniffer/Logger.o  snifferd.o UI/CommandLineInterface.o -o snifferd
+daemonize: Sniffer/Sniffer.o Sniffer/Logger.o  snifferd.o UI/CommandLineInterface.o Sniffer/SignalHandlers.o
+	clang -std=gnu99 Sniffer/Sniffer.o Sniffer/Logger.o  snifferd.o UI/CommandLineInterface.o Sniffer/SignalHandlers.o -o snifferd
 
-test: test.o Sniffer/Sniffer.o Sniffer/Logger.o
-	clang -std=gnu99 test.o Sniffer/Sniffer.o Sniffer/Logger.o -o test
+test: Sniffer/Sniffer.o Sniffer/Logger.o  test.o Sniffer/SignalHandlers.o
+	clang -std=gnu99 Sniffer/Sniffer.o Sniffer/Logger.o Sniffer/SignalHandlers.o test.o -o test
 
 test.o: test.c
 	clang -c test.c
@@ -17,6 +17,9 @@ Logger.o: Sniffer/Logger.c
 
 CommandLineInterface.o: UI/CommandLineInterface.c
 	clang -c UI/CommandLineInterface.c
+
+SignalHandlers.o: Sniffer/SignalHandlers.c
+	clang -c Sniffer/SignalHandlers.c
 
 snifferd.o: snifferd.c
 	clang -c snifferd.c

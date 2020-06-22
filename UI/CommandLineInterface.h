@@ -1,5 +1,7 @@
 #pragma once
 #include "../Sniffer/Logger.h"
+#include <sys/signal.h>
+#include <unistd.h>
 
 int start();
 int stop();

@@ -41,12 +41,13 @@ void error_log(char* error_message) {
     struct tm * timeinfo;
     time ( &rawtime );
     timeinfo = localtime ( &rawtime );
-    fprintf("%s\t--\t%s", error_message, asctime (timeinfo));
+    fprintf(logfile, "%s\t--\t%s", error_message, asctime (timeinfo));
     fflush(logfile);
     fclose(logfile);
 }
 
 int read_logs(PacketLog* packet_logs[], int* size, FILE* logfile) {
+    printf("Saved conf.\n");
     int line_index = 0;
     PacketLog temp_log;
     struct in_addr temp_addr;
