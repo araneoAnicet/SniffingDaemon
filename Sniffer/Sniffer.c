@@ -34,6 +34,7 @@ int create_sniffer_socket(Sniffer* sniffer) {
 void close_sniffer_socket(Sniffer* sniffer) {
     close(sniffer->socket.fd);
     free(sniffer->socket.buffer);
+    free(sniffer->packet_logs);
     error_log("Sniffer is removed successfully!\n");
 }
 
@@ -89,6 +90,8 @@ int sniff(Sniffer* sniffer) {
                 // if this IP address has already sent any packets
                 (sniffer->packet_logs)[searched_index].amount_of_packets += 1;
             }
+
+            // saving to log files
             char logfile_name_buffer[120];
             sprintf(logfile_name_buffer, "%s/%s.log", LOGS_FOLDER, sniffer->socket.interface_name);
             logfile = fopen(logfile_name_buffer, "w");
