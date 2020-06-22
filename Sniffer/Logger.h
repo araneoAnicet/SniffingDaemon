@@ -13,6 +13,7 @@
 #define LOG_FILE_NAME "NetworkSniffing.log"
 #define ERRORS_LOG_FILE_NAME "Errors.log"
 #define LOGS_FOLDER "/var/log/snifferd"
+#define CONF_FILE "/var/log/snifferd/settings.conf"
 #define PACKETS_BUFFER_SIZE 1024
 #define IP_LINE_INDEX 0
 #define PACKETS_LINE_INDEX 1
@@ -41,6 +42,7 @@ int save_logs(
 );
 
 int check_folder();
+int save_conf(char* interface, int status);  // status = 0 - is off; status = 1 - is on
 
 // logs errors into .log file
 void error_log(char* error_message);

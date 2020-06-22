@@ -136,3 +136,14 @@ int check_folder() {
     }
     return -1;
 }
+
+int save_conf(char* interface, int status) {  // status = 0 - is off; status = 1 - is on
+    FILE* conf_file = fopen(CONF_FILE, "w");
+    if (conf_file == NULL) {
+        return -1;
+    }
+    fprintf(conf_file, "%d\n%d\n%s\n", getpid(), status, interface);
+    fflush(conf_file);
+    fclose(conf_file);
+    return 0;
+}
