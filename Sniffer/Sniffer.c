@@ -40,17 +40,14 @@ int sniff(Sniffer* sniffer) {
     socklen_t source_addr_len = sizeof(source_addr);
     struct iphdr* ip_headers;
     FILE* logfile;
-
-    PacketLog* packet_logs;
     PacketLog new_packet_log;
-    int packet_logs_size;
     int searched_index;
     
-    create_packet_logs_vector(&packet_logs, &packet_logs_size);
+    create_packet_logs_vector(&(sniffer->packet_logs), &(sniffer->packet_logs_size));
 
     logfile = fopen(LOG_FILE_NAME, "r");
     if (logfile != NULL) {
-        if (read_logs(&packet_logs, &packet_logs_size, logfile) == -1) {
+        if (read_logs(&(sniffer->packet_logs), &(sniffer->packet_logs_size), logfile) == -1) {
             error_log("An error occurred while reading logs\n");
             return -1;
         }
@@ -78,14 +75,14 @@ int sniff(Sniffer* sniffer) {
             new_packet_log.interface = sniffer->socket.interface_name;
             new_packet_log.ip.s_addr = ip_headers->saddr;
 
-            searched_index = search_log(packet_logs, new_packet_log, 0, packet_logs_size - 1);
+            searched_index = search_log(sniffer->packet_logs, new_packet_log, 0, sniffer->packet_logs_size - 1);
             if (searched_index == -1) {
                 // if there is new IP address
-                packet_logs_append(&packet_logs, &packet_logs_size, new_packet_log);
-                sort_logs(packet_logs, packet_logs_size);
+                packet_logs_append(&(sniffer->packet_logs), &(sniffer->packet_logs_size), new_packet_log);
+                sort_logs(sniffer->packet_logs, sniffer->packet_logs_size);
             } else {
                 // if this IP address has already sent any packets
-                packet_logs[searched_index].amount_of_packets += 1;
+                (sniffer->packet_logs)[searched_index].amount_of_packets += 1;
             }
 
             // updating log file
@@ -94,7 +91,7 @@ int sniff(Sniffer* sniffer) {
                 error_log("An erro occurred while openning log file\n");
                 return -1;
             }
-            if (save_logs(logfile, packet_logs, packet_logs_size)) {
+            if (save_logs(logfile, sniffer->packet_logs, sniffer->packet_logs_size)) {
                 return -1;
             }
             fclose(logfile);
