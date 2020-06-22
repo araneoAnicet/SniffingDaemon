@@ -1,6 +1,7 @@
 #include "Sniffer/Sniffer.h"
 #include "Sniffer/Logger.h"
 #include "UI/CommandLineInterface.h"
+#include "Sniffer/SignalHandlers.h"
 #include <sys/signal.h>
 
 int main(int argc, char* argv[]) {
