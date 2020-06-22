@@ -1,5 +1,22 @@
 #include "Sniffer.h"
 
+int termination_handler(int sig) {
+    remove(CONF_FILE);
+    // updating log file
+    char logfile_name_buffer[30];
+    strcat(logfile_name_buffer, sniffer.socket.interface_name);
+    strcat(logfile_name_buffer, ".log");
+    FILE* logfile = fopen(logfile_name_buffer, "w");
+    if (logfile == NULL) {
+        error_log("An erro occurred while openning log file\n");
+        return -1;
+    }
+    if (save_logs(logfile, sniffer.packet_logs, sniffer.packet_logs_size)) {
+        return -1;
+    }
+    fclose(logfile);
+}
+
 int create_sniffer_socket(Sniffer* sniffer) {
     int socket_fd = socket(
         sniffer->socket.domain,
@@ -84,17 +101,6 @@ int sniff(Sniffer* sniffer) {
                 // if this IP address has already sent any packets
                 (sniffer->packet_logs)[searched_index].amount_of_packets += 1;
             }
-
-            // updating log file
-            logfile = fopen(LOG_FILE_NAME, "w");
-            if (logfile == NULL) {
-                error_log("An erro occurred while openning log file\n");
-                return -1;
-            }
-            if (save_logs(logfile, sniffer->packet_logs, sniffer->packet_logs_size)) {
-                return -1;
-            }
-            fclose(logfile);
         }
     }
     //free(packet_logs);

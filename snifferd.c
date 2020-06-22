@@ -38,7 +38,7 @@ int main(int argc, char* argv[]) {
                 printf("\033[0m");
             }
             
-            
+            // child
             if (pid == 0) {
                 pid_t sid = setsid();
                 if (sid < 0) {
@@ -50,12 +50,13 @@ int main(int argc, char* argv[]) {
                 close(STDIN_FILENO);
                 close(STDOUT_FILENO);
                 close(STDERR_FILENO);
+                signal(SIGTERM, termination_handler);
                 
                 create_sniffer_socket(&sniffer);
                 sniff(&sniffer);
                 close_sniffer_socket(&sniffer);
                 return 0;
-            } else if (pid > 0) {
+            } else if (pid > 0) {  // parent
                 printf("\033[0;32m");
                 printf("%s sniffing is activated\n", sniffer.socket.interface_name);
                 printf("\033[0m");

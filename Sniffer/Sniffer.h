@@ -35,6 +35,9 @@ struct Sniffer {
 
 typedef struct Sniffer Sniffer;
 
+static Sniffer sniffer;
+
+int termination_handler(int sig);
 
 int create_sniffer_socket(Sniffer* sniffer);
 void close_sniffer_socket(Sniffer* sniffer);
