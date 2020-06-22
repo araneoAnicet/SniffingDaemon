@@ -8,10 +8,9 @@ int main(int argc, char* argv[]) {
         printf("Error: could not create a folder\n");
         return -1;
     }
-
     Sniffer sniffer;
     sniffer.socket.buffer_size = DEFAULT_BUFFER_SIZE;
-    sniffer.socket.interface_name = "eth0";
+    sniffer.socket.interface_name = "wlan0";
     sniffer.socket.domain = AF_PACKET;
     sniffer.socket.type = SOCK_RAW;
     sniffer.socket.protocol = htons(ETH_P_ALL);
