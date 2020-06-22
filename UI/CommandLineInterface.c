@@ -56,3 +56,25 @@ int show(char* ip) {
     kill(get_daemon_pid(), SIGUSR1);
     while (1);  // waiting for interrupt from background process
 }
+
+int select_iface(char* interface_name) {
+    if (check_if_interface_is_available(interface_name) == 0) {
+        pid_t pid = get_daemon_pid();
+        if (pid == -1) {
+            save_conf(interface_name, 0);  // just changes the configurations
+            printf("\033[0;32m");
+            printf("Success! Your current interface is %s\n", interface_name);
+            printf("\033[0m");
+            return 0;
+        }
+        printf("\033[31m");
+        printf("Error: the proccess is already running, stop it to change the interface\n");
+        printf("\033[0m");
+        printf("Type -- help for more details.\n");
+        return -1;
+    }
+    printf("\033[31m");
+    printf("Error: seems like this interface is not available on your machine\n");
+    printf("\033[0m");        
+    return -1;
+}

@@ -7,6 +7,6 @@
 int start();
 int stop();
 int show(char* ip);
-int select_iface(char* interface);
+int select_iface(char* interface_name);
 int statistics(char* interface);
 void help();
